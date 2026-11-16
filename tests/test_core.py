@@ -22,7 +22,6 @@ class TestNanoVectorIndex(unittest.TestCase):
         self.assertAlmostEqual(results[0][1], 0.0, places=5)
 
     def test_nearest_neighbor_ranking(self):
-        # Insert target and near target
         self.index.insert([1.0, 0.0, 0.0])
         self.index.insert([0.9, 0.1, 0.0])
         self.index.insert([0.0, 1.0, 0.0])
@@ -32,9 +31,11 @@ class TestNanoVectorIndex(unittest.TestCase):
         self.assertIn(0, top_ids)
         self.assertIn(1, top_ids)
 
-    def test_dimension_mismatch_raises(self):
+    def test_insert_dim_mismatch_raises(self):
         with self.assertRaises(ValueError):
             self.index.insert([1.0, 0.0])
+
+    def test_search_dim_mismatch_raises(self):
         with self.assertRaises(ValueError):
             self.index.search([1.0, 0.0, 0.0, 0.0])
 

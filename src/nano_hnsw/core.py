@@ -28,7 +28,6 @@ class NanoVectorIndex:
         if norm1 == 0.0 or norm2 == 0.0:
             return 1.0
         similarity = dot / (norm1 * norm2)
-        # Numerical guard
         similarity = max(-1.0, min(1.0, similarity))
         return 1.0 - similarity
 
@@ -44,7 +43,7 @@ class NanoVectorIndex:
         if idx == 0:
             return idx
 
-        # Rank all existing nodes by proximity to form proximity graph
+        # Rank existing nodes by proximity to form small-world graph edges
         k = min(self.max_neighbors, idx)
         distances = [(self.cosine_distance(vec, self.vectors[i]), i) for i in range(idx)]
         distances.sort(key=lambda x: x[0])
@@ -53,7 +52,6 @@ class NanoVectorIndex:
             self.graph[idx].append(neighbor)
             if idx not in self.graph[neighbor]:
                 self.graph[neighbor].append(idx)
-                # Trim if over max degree
                 if len(self.graph[neighbor]) > self.max_neighbors * 2:
                     self.graph[neighbor].pop(0)
 
@@ -64,10 +62,11 @@ class NanoVectorIndex:
         Traverses proximity graph using best-first search to find approximate nearest neighbors.
         Returns: List of (vector_id, distance) sorted by ascending distance.
         """
-        if not self.vectors:
-            return []
         if len(query) != self.dim:
             raise ValueError(f"Query dim {len(query)} does not match index dim {self.dim}")
+
+        if not self.vectors:
+            return []
 
         # Start from entry point
         curr = random.randint(0, len(self.vectors) - 1)
@@ -87,7 +86,6 @@ class NanoVectorIndex:
                         curr = neighbor
                         changed = True
 
-        # Aggregate visited pool and return top-k
         scored = [(i, self.cosine_distance(query, self.vectors[i])) for i in visited]
         scored.sort(key=lambda x: x[1])
         return scored[:top_k]
