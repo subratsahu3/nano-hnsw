@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nano-hnsw"
+version = "0.1.0"
+description = "Embedded Quantized Hierarchical Navigable Small World Vector Index"
+readme = "README.md"
+authors = [{ name = "Subrat Sahu", email = "subratsahu195@gmail.com" }]
+license = { text = "MIT" }
+requires-python = ">=3.9"
+
+[tool.setuptools.packages.find]
+where = ["src"]
